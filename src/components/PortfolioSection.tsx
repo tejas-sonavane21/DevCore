@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import projectImage1 from "@/assets/project-dashboard-1.png";
 import projectImage2 from "@/assets/project-dashboard-2.png";
 import projectImage3 from "@/assets/project-dashboard-3.png";
@@ -53,18 +53,46 @@ const projects = [
 
 const PortfolioSection = () => {
   const isMobile = useIsMobile();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [cardOrder, setCardOrder] = useState(projects.map((_, i) => i));
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Auto-advance cards on mobile every 5 seconds
-  useEffect(() => {
-    if (!isMobile) return;
+  const handleSwipe = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    // Move top card to bottom of stack
+    setTimeout(() => {
+      setCardOrder((prev) => {
+        const newOrder = [...prev];
+        const first = newOrder.shift()!;
+        newOrder.push(first);
+        return newOrder;
+      });
+      setSwipeOffset(0);
+      setIsAnimating(false);
+    }, 300);
+  };
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % projects.length);
-    }, 5000);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
 
-    return () => clearInterval(interval);
-  }, [isMobile]);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current || isAnimating) return;
+    const deltaX = e.touches[0].clientX - touchStartRef.current.x;
+    setSwipeOffset(deltaX);
+  };
+
+  const handleTouchEnd = () => {
+    if (Math.abs(swipeOffset) > 80) {
+      handleSwipe();
+    } else {
+      setSwipeOffset(0);
+    }
+    touchStartRef.current = null;
+  };
 
   return (
     <section id="portfolio" className="py-16 sm:py-20 lg:py-24 overflow-hidden">
@@ -79,64 +107,70 @@ const PortfolioSection = () => {
         </div>
       </div>
 
-      {/* Mobile: Single card slideshow */}
+      {/* Mobile: Swipeable card stack */}
       {isMobile ? (
         <div className="container mx-auto px-4">
-          <div className="relative">
-            {projects.map((project, index) => (
-              <Card
-                key={project.id}
-                className={`glass-card overflow-hidden transition-all duration-500 ${
-                  index === currentIndex
-                    ? "opacity-100 translate-x-0"
-                    : "opacity-0 absolute inset-0 translate-x-full pointer-events-none"
-                }`}
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end justify-end p-4">
-                    <ExternalLink className="text-primary" size={20} />
-                  </div>
-                </div>
+          <div 
+            className="relative h-[420px] flex items-center justify-center"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {cardOrder.map((projectIndex, stackIndex) => {
+              const project = projects[projectIndex];
+              const isTop = stackIndex === 0;
+              const offset = Math.min(stackIndex, 4); // Only show 5 cards in stack
+              
+              if (stackIndex > 4) return null;
 
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-bold mb-2 text-foreground">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="tech-badge">
-                        {tag}
-                      </span>
-                    ))}
+              return (
+                <Card
+                  key={project.id}
+                  className="glass-card overflow-hidden absolute w-[85%] max-w-[320px] transition-all duration-300 ease-out"
+                  style={{
+                    transform: isTop
+                      ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg) ${isAnimating ? 'translateX(120%) rotate(15deg)' : ''}`
+                      : `translateY(${offset * 8}px) scale(${1 - offset * 0.04})`,
+                    zIndex: 10 - stackIndex,
+                    opacity: isTop && isAnimating ? 0 : 1 - offset * 0.15,
+                    pointerEvents: isTop ? 'auto' : 'none',
+                  }}
+                >
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end justify-end p-4">
+                      <ExternalLink className="text-primary" size={20} />
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-bold mb-2 text-foreground">
+                      {project.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span key={tag} className="tech-badge">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
-          {/* Dot indicators */}
-          <div className="flex justify-center gap-2 mt-6">
-            {projects.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? "bg-primary w-6"
-                    : "bg-muted-foreground/40"
-                }`}
-                aria-label={`Go to project ${index + 1}`}
-              />
-            ))}
-          </div>
+          {/* Swipe hint */}
+          <p className="text-center text-muted-foreground text-xs mt-4">
+            Swipe to see more projects
+          </p>
         </div>
       ) : (
         /* Desktop/Tablet: Marquee scroll */
