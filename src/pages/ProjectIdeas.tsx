@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useContactModal } from "@/contexts/ContactModalContext";
 import projectImage1 from "@/assets/project-dashboard-1.png";
 import projectImage2 from "@/assets/project-dashboard-2.png";
 import projectImage3 from "@/assets/project-dashboard-3.png";
@@ -89,6 +90,8 @@ const getDifficultyColor = (difficulty: string) => {
 };
 
 const ProjectIdeas = () => {
+  const { openModal } = useContactModal();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -134,7 +137,7 @@ const ProjectIdeas = () => {
                 <div className="text-xs text-muted-foreground">Customizable</div>
               </div>
             </div>
-            <Button variant="glow" className="min-h-[44px] w-full sm:w-auto">
+            <Button variant="glow" className="min-h-[44px] w-full sm:w-auto" onClick={openModal}>
               Request Custom Project
             </Button>
           </div>
@@ -221,12 +224,12 @@ const ProjectIdeas = () => {
               Our team specializes in custom projects. Share your unique idea and we'll bring it to life.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="glow" size="lg" className="gap-2 min-h-[44px]">
+              <Button variant="glow" size="lg" className="gap-2 min-h-[44px]" onClick={openModal}>
                 Discuss Your Idea
                 <ArrowRight size={18} />
               </Button>
-              <Button variant="outline" size="lg" className="min-h-[44px] border-border hover:bg-muted/50">
-                View Our Process
+              <Button variant="outline" size="lg" className="min-h-[44px] border-border hover:bg-muted/50" asChild>
+                <Link to="/#process">View Our Process</Link>
               </Button>
             </div>
           </div>

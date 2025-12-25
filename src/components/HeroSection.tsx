@@ -1,9 +1,12 @@
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useContactModal } from "@/contexts/ContactModalContext";
 import heroImage from "@/assets/hero-code-blocks.png";
 
 const HeroSection = () => {
+  const { openModal } = useContactModal();
+
   return (
     <section className="min-h-screen flex items-center pt-20 relative overflow-hidden">
       {/* Background code pattern */}
@@ -40,7 +43,12 @@ const HeroSection = () => {
                   <ArrowRight size={18} />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" className="gap-2 border-border hover:bg-muted/50 min-h-[44px]">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="gap-2 border-border hover:bg-muted/50 min-h-[44px]"
+                onClick={openModal}
+              >
                 <MessageCircle size={18} />
                 Talk to a Developer
               </Button>

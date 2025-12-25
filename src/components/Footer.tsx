@@ -1,6 +1,10 @@
 import { Github, Linkedin, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useContactModal } from "@/contexts/ContactModalContext";
 
 const Footer = () => {
+  const { openModal } = useContactModal();
+
   return (
     <footer id="contact" className="py-12 border-t border-border">
       <div className="container mx-auto px-6">
@@ -12,25 +16,30 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
-            <a
-              href="#"
-              className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
-            >
-              <Github size={20} />
-            </a>
-            <a
-              href="#"
-              className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
-            >
-              <Linkedin size={20} />
-            </a>
-            <a
-              href="mailto:hello@codetrio.dev"
-              className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
-            >
-              <Mail size={20} />
-            </a>
+          <div className="flex items-center gap-4">
+            <Button variant="glow" size="sm" onClick={openModal}>
+              Discuss Your Ideas
+            </Button>
+            <div className="flex items-center gap-3">
+              <a
+                href="#"
+                className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
+              >
+                <Github size={20} />
+              </a>
+              <a
+                href="#"
+                className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
+              >
+                <Linkedin size={20} />
+              </a>
+              <a
+                href="mailto:hello@codetrio.dev"
+                className="p-3 glass-card rounded-xl text-muted-foreground hover:text-primary hover:glow-primary transition-all duration-300"
+              >
+                <Mail size={20} />
+              </a>
+            </div>
           </div>
         </div>
 

@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useContactModal } from "@/contexts/ContactModalContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { openModal } = useContactModal();
 
   const navLinks = [
     { name: "Services", href: "#services" },
@@ -33,7 +35,7 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <Button variant="glow" size="default">
+            <Button variant="glow" size="default" onClick={openModal}>
               Book a Consultation
             </Button>
           </div>
@@ -61,7 +63,7 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <Button variant="glow" className="w-full mt-2 min-h-[44px]">
+            <Button variant="glow" className="w-full mt-2 min-h-[44px]" onClick={() => { openModal(); setIsOpen(false); }}>
               Book a Consultation
             </Button>
           </div>
