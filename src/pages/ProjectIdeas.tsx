@@ -247,10 +247,13 @@ const ProjectIdeas = () => {
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
               Our team specializes in custom projects. Share your unique idea and we'll bring it to life.
             </p>
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="glow" size="lg" className="gap-2 min-h-[44px]" onClick={openModal}>
                 Discuss Your Idea
                 <ArrowRight size={18} />
+              </Button>
+              <Button variant="outline" size="lg" className="min-h-[44px] border-border hover:bg-muted/50" asChild>
+                <Link to="/#process">View Our Process</Link>
               </Button>
             </div>
           </div>
