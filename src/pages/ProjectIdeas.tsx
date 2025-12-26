@@ -16,7 +16,7 @@ const projectTemplates = [
   {
     id: 1,
     title: "AI-Powered Attendance System",
-    description: "Face recognition-based attendance management with real-time tracking and comprehensive reporting dashboard.",
+    description: "Face recognition attendance management with real-time tracking and reporting dashboard.",
     image: projectImage1,
     tags: ["Python", "OpenCV", "Flask", "MySQL"],
     difficulty: "Advanced",
@@ -24,7 +24,7 @@ const projectTemplates = [
   {
     id: 2,
     title: "Smart Traffic Management",
-    description: "IoT-based traffic monitoring with ML prediction for congestion and automated signal optimization.",
+    description: "IoT-based traffic monitoring with ML prediction and automated signal optimization system.",
     image: projectImage2,
     tags: ["Python", "TensorFlow", "Arduino", "React"],
     difficulty: "Advanced",
@@ -32,7 +32,7 @@ const projectTemplates = [
   {
     id: 3,
     title: "E-Commerce Platform",
-    description: "Full-stack online marketplace with payment integration, inventory management, and admin dashboard.",
+    description: "Full-stack marketplace with payment integration, inventory, and admin dashboard.",
     image: projectImage3,
     tags: ["React", "Node.js", "MongoDB", "Stripe"],
     difficulty: "Intermediate",
@@ -40,7 +40,7 @@ const projectTemplates = [
   {
     id: 4,
     title: "Hospital Management System",
-    description: "Complete HMS with patient records, appointment scheduling, billing, and pharmacy management modules.",
+    description: "Complete HMS with patient records, scheduling, billing, and pharmacy modules.",
     image: projectImage1,
     tags: ["Django", "PostgreSQL", "React", "Docker"],
     difficulty: "Advanced",
@@ -48,7 +48,7 @@ const projectTemplates = [
   {
     id: 5,
     title: "Online Learning Platform",
-    description: "LMS with video streaming, quiz modules, progress tracking, and certificate generation.",
+    description: "LMS with video streaming, quizzes, progress tracking, and certificate generation.",
     image: projectImage2,
     tags: ["React", "Firebase", "Node.js", "AWS"],
     difficulty: "Intermediate",
@@ -56,7 +56,7 @@ const projectTemplates = [
   {
     id: 6,
     title: "Expense Tracker App",
-    description: "Personal finance management with budget planning, expense categorization, and visual analytics.",
+    description: "Personal finance app with budgeting, expense categorization, and visual analytics.",
     image: projectImage3,
     tags: ["Flutter", "Firebase", "Dart", "Charts"],
     difficulty: "Beginner",
@@ -64,7 +64,7 @@ const projectTemplates = [
   {
     id: 7,
     title: "Social Media Dashboard",
-    description: "Analytics dashboard aggregating data from multiple social platforms with sentiment analysis.",
+    description: "Analytics dashboard aggregating social platform data with sentiment analysis.",
     image: projectImage1,
     tags: ["Python", "React", "API Integration", "NLP"],
     difficulty: "Advanced",
@@ -72,7 +72,7 @@ const projectTemplates = [
   {
     id: 8,
     title: "Food Delivery System",
-    description: "Complete food ordering platform with restaurant management, driver tracking, and payment processing.",
+    description: "Food ordering platform with restaurant management, tracking, and payments.",
     image: projectImage2,
     tags: ["React Native", "Node.js", "MongoDB", "Maps API"],
     difficulty: "Intermediate",
@@ -161,17 +161,19 @@ const ProjectIdeas = () => {
       {/* Projects Grid */}
       <section className="pb-16 sm:pb-20 lg:pb-24">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projectTemplates.map((project) => {
               const isExpanded = expandedCardId === project.id;
               
               return (
                 <Card
                   key={project.id}
-                  className="group glass-card overflow-hidden hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col"
+                  className={`group glass-card overflow-hidden hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col ${
+                    isMobile ? 'h-auto' : 'h-full'
+                  }`}
                 >
-                  {/* Image Container - 16:9 aspect ratio */}
-                  <div className="relative aspect-video overflow-hidden">
+                  {/* Header: Image */}
+                  <div className="relative aspect-video overflow-hidden flex-shrink-0">
                     <img
                       src={project.image}
                       alt={project.title}
@@ -184,37 +186,31 @@ const ProjectIdeas = () => {
                     </div>
                   </div>
 
+                  {/* Body & Footer with flex structure */}
                   <CardContent className="p-4 sm:p-5 flex flex-col flex-grow">
-                    <h3 className="text-base sm:text-lg font-bold mb-2 text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {/* Title */}
+                    <h3 className="text-base sm:text-lg font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
                       {project.title}
                     </h3>
                     
-                    {/* Description - truncated by default, full on mobile expand */}
-                    <p className={`text-muted-foreground text-sm mb-4 transition-all duration-300 ${
-                      isMobile && isExpanded ? '' : 'line-clamp-2'
-                    }`}>
+                    {/* Body: Description with flex-grow */}
+                    <p className={`text-muted-foreground text-sm mb-4 ${
+                      isMobile ? '' : 'flex-grow'
+                    } ${isMobile && isExpanded ? '' : ''}`}>
                       {project.description}
                     </p>
                     
-                    {/* Tech Tags - limited by default, all on mobile expand */}
-                    <div className={`flex flex-wrap gap-1.5 mb-4 transition-all duration-300 ${
-                      isMobile && isExpanded ? '' : 'flex-grow'
-                    }`}>
-                      {(isMobile && isExpanded ? project.tags : project.tags.slice(0, 3)).map((tag) => (
+                    {/* Footer: Tech Tags */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {project.tags.map((tag) => (
                         <span key={tag} className="tech-badge text-xs">
                           {tag}
                         </span>
                       ))}
-                      {!isMobile && project.tags.length > 3 && (
-                        <span className="tech-badge text-xs">+{project.tags.length - 3}</span>
-                      )}
-                      {isMobile && !isExpanded && project.tags.length > 3 && (
-                        <span className="tech-badge text-xs">+{project.tags.length - 3}</span>
-                      )}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2">
+                    {/* Footer: Action Buttons - pinned to bottom */}
+                    <div className="flex flex-col sm:flex-row gap-2 mt-auto">
                       <Button 
                         variant="glow" 
                         size="sm" 
@@ -229,17 +225,8 @@ const ProjectIdeas = () => {
                         className="flex-1 gap-2 min-h-[40px] border-border hover:bg-muted/50"
                         onClick={() => handleTechSpecsClick(project)}
                       >
-                        {isMobile && isExpanded ? (
-                          <>
-                            <ChevronUp size={14} />
-                            Show Less
-                          </>
-                        ) : (
-                          <>
-                            <FileText size={14} />
-                            Tech Specs
-                          </>
-                        )}
+                        <FileText size={14} />
+                        Tech Specs
                       </Button>
                     </div>
                   </CardContent>
