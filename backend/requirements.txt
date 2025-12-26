@@ -1,0 +1,8 @@
+# Python 3.12 compatible dependencies
+flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+
+# Use older supabase that has consistent dependencies
+supabase==2.0.0

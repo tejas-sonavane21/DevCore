@@ -1,73 +1,114 @@
-# Welcome to your Lovable project
+# Project Forge
 
-## Project info
+A modern business website for Project Forge - a service helping students with final year projects. Features a React frontend with a Flask backend and Supabase database integration.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Structure
 
-## How can I edit this code?
+```
+project-forge/
+├── frontend/           # React (Vite) frontend
+│   ├── src/
+│   │   ├── components/ # UI components
+│   │   ├── pages/      # Page components (including admin)
+│   │   ├── lib/        # Utilities and API service
+│   │   └── contexts/   # React contexts
+│   └── ...
+├── backend/            # Flask backend
+│   ├── routes/         # API routes
+│   ├── migrations/     # SQL migration scripts
+│   └── ...
+├── .env.example        # Environment variables template
+└── .gitignore
+```
 
-There are several ways of editing your application.
+## Quick Start
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- Node.js 18+ and npm
+- Python 3.10+
+- Supabase account
 
-Changes made via Lovable will be committed automatically to this repo.
+### 1. Clone and Setup Environment
 
-**Use your preferred IDE**
+```bash
+# Copy environment template
+cp .env.example .env
+# Edit .env with your Supabase credentials
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 2. Setup Database
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Go to your Supabase project's SQL Editor
+2. Run `backend/migrations/001_initial_schema.sql`
+3. Run `backend/migrations/002_seed_data.sql`
+4. Create a storage bucket named `images` in Supabase Storage
 
-Follow these steps:
+### 3. Start Backend
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
+pip install -r requirements.txt
+python app.py
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Backend runs at: http://localhost:5000
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 4. Start Frontend
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Frontend runs at: http://localhost:5173
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Features
 
-**Use GitHub Codespaces**
+### Public Website
+- **Home Page**: Hero section, value proposition, team showcase, tech stack, portfolio, and process timeline
+- **Project Ideas**: Browse project templates with filtering and detailed tech specs
+- **Contact Form**: Dynamic contact modal for inquiries
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Admin Panel
+Access at `/admin` with configured credentials:
+- **Dashboard**: Overview with stats and recent contacts
+- **Templates**: CRUD for project templates
+- **Portfolio**: CRUD for portfolio projects
+- **Team**: CRUD for team members
+- **Contacts**: View and manage form submissions
 
-## What technologies are used for this project?
+## Tech Stack
 
-This project is built with:
-
+### Frontend
+- React 18 + TypeScript
 - Vite
-- TypeScript
-- React
-- shadcn-ui
 - Tailwind CSS
+- TanStack Query (React Query)
+- React Router
 
-## How can I deploy this project?
+### Backend
+- Flask
+- Supabase (PostgreSQL + Storage)
+- Flask-CORS
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Environment Variables
 
-## Can I connect a custom domain to my Lovable project?
+See `.env.example` for all required variables:
 
-Yes, you can!
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
+FLASK_SECRET_KEY=your_secret_key
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_admin_password
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT

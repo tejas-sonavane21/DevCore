@@ -9,6 +9,14 @@ import Index from "./pages/Index";
 import ProjectIdeas from "./pages/ProjectIdeas";
 import NotFound from "./pages/NotFound";
 
+// Admin Pages
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminTemplates from "./pages/admin/AdminTemplates";
+import AdminPortfolio from "./pages/admin/AdminPortfolio";
+import AdminTeam from "./pages/admin/AdminTeam";
+import AdminContacts from "./pages/admin/AdminContacts";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -20,9 +28,20 @@ const App = () => (
         <ContactModal />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/project-ideas" element={<ProjectIdeas />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="templates" element={<AdminTemplates />} />
+              <Route path="portfolio" element={<AdminPortfolio />} />
+              <Route path="team" element={<AdminTeam />} />
+              <Route path="contacts" element={<AdminContacts />} />
+            </Route>
+
+            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

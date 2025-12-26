@@ -1,42 +1,34 @@
 import { Github, Linkedin } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getTeamMembers, fallbackTeam, TeamMember } from "@/lib/api";
 
 const TeamSection = () => {
   const isMobile = useIsMobile();
-  const [cardOrder, setCardOrder] = useState([0, 1, 2]);
+  const [cardOrder, setCardOrder] = useState<number[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  const team = [
-    {
-      name: "Alex Chen",
-      role: "Python Expert",
-      bio: "Helping students ace their vivas since 2023. Django, Flask, ML - you name it.",
-      skills: ["Python", "Django", "Machine Learning"],
-      color: "primary",
-    },
-    {
-      name: "Jordan Dev",
-      role: "Frontend Wizard",
-      bio: "Making sure your project isn't just functional, but looks stunning too.",
-      skills: ["React", "TypeScript", "Tailwind CSS"],
-      color: "secondary",
-    },
-    {
-      name: "Sam Kumar",
-      role: "Database Architect",
-      bio: "The one who makes sure your data flows smoothly. MySQL, PostgreSQL, MongoDB.",
-      skills: ["MySQL", "PostgreSQL", "System Design"],
-      color: "primary",
-    },
-  ];
+  // Fetch team members from API
+  const { data: team = fallbackTeam, isLoading } = useQuery<TeamMember[]>({
+    queryKey: ['team'],
+    queryFn: getTeamMembers,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Initialize card order when team data changes
+  useEffect(() => {
+    if (team.length > 0) {
+      setCardOrder(team.map((_, i) => i));
+    }
+  }, [team]);
 
   const handleSwipe = () => {
-    if (isAnimating) return;
+    if (isAnimating || team.length === 0) return;
     setIsAnimating(true);
-    
+
     setTimeout(() => {
       setCardOrder((prev) => {
         const newOrder = [...prev];
@@ -51,8 +43,8 @@ const TeamSection = () => {
 
   // Auto-slide every 2.5 seconds on mobile
   useEffect(() => {
-    if (!isMobile) return;
-    
+    if (!isMobile || team.length === 0) return;
+
     const interval = setInterval(() => {
       if (!isAnimating) {
         handleSwipe();
@@ -60,7 +52,7 @@ const TeamSection = () => {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isMobile, isAnimating]);
+  }, [isMobile, isAnimating, team.length]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -81,6 +73,21 @@ const TeamSection = () => {
     touchStartRef.current = null;
   };
 
+  if (isLoading) {
+    return (
+      <section id="team" className="py-24 relative">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Meet the <span className="text-gradient">Builders</span>
+            </h2>
+            <p className="text-muted-foreground">Loading team members...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="team" className="py-24 relative">
       <div className="container mx-auto px-6">
@@ -95,7 +102,7 @@ const TeamSection = () => {
 
         {/* Mobile: Stacked swipeable cards with auto-slide */}
         {isMobile ? (
-          <div 
+          <div
             className="relative h-[380px] flex items-center justify-center"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -103,11 +110,12 @@ const TeamSection = () => {
           >
             {cardOrder.map((memberIndex, stackIndex) => {
               const member = team[memberIndex];
+              if (!member) return null;
               const isTop = stackIndex === 0;
-              
+
               return (
                 <div
-                  key={memberIndex}
+                  key={member.id}
                   className="group glass-card rounded-2xl p-6 absolute w-[85%] max-w-[320px] transition-all duration-300 ease-out overflow-hidden"
                   style={{
                     transform: isTop
@@ -116,29 +124,31 @@ const TeamSection = () => {
                     zIndex: 10 - stackIndex,
                     opacity: isTop && isAnimating ? 0 : 1 - stackIndex * 0.2,
                     pointerEvents: isTop ? 'auto' : 'none',
-                    boxShadow: member.color === "primary" 
-                      ? "0 0 40px hsl(217 91% 60% / 0.15)" 
+                    boxShadow: member.color_theme === "primary"
+                      ? "0 0 40px hsl(217 91% 60% / 0.15)"
                       : "0 0 40px hsl(142 71% 45% / 0.15)"
                   }}
                 >
                   {/* Avatar placeholder */}
-                  <div 
-                    className={`w-16 h-16 rounded-2xl mb-4 flex items-center justify-center text-xl font-bold ${
-                      member.color === "primary" 
-                        ? "bg-primary/20 text-primary" 
+                  <div
+                    className={`w-16 h-16 rounded-2xl mb-4 flex items-center justify-center text-xl font-bold ${member.color_theme === "primary"
+                        ? "bg-primary/20 text-primary"
                         : "bg-secondary/20 text-secondary"
-                    }`}
+                      }`}
                   >
-                    {member.name.split(" ").map(n => n[0]).join("")}
+                    {member.avatar_url ? (
+                      <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover rounded-2xl" />
+                    ) : (
+                      member.name.split(" ").map(n => n[0]).join("")
+                    )}
                   </div>
 
                   <h3 className="text-lg font-bold mb-1">{member.name}</h3>
-                  <div 
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${
-                      member.color === "primary"
+                  <div
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${member.color_theme === "primary"
                         ? "bg-primary/20 text-primary"
                         : "bg-secondary/20 text-secondary"
-                    }`}
+                      }`}
                   >
                     {member.role}
                   </div>
@@ -154,10 +164,10 @@ const TeamSection = () => {
                   </div>
 
                   <div className="flex gap-3 pt-3 border-t border-border">
-                    <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                    <a href={member.github_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
                       <Github size={18} />
                     </a>
-                    <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                    <a href={member.linkedin_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
                       <Linkedin size={18} />
                     </a>
                   </div>
@@ -168,34 +178,36 @@ const TeamSection = () => {
         ) : (
           /* Desktop/Tablet: Original grid layout */
           <div className="grid md:grid-cols-3 gap-6">
-            {team.map((member, index) => (
+            {team.map((member) => (
               <div
-                key={index}
+                key={member.id}
                 className="group glass-card rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300 relative overflow-hidden"
                 style={{
-                  boxShadow: member.color === "primary" 
-                    ? "0 0 40px hsl(217 91% 60% / 0.1)" 
+                  boxShadow: member.color_theme === "primary"
+                    ? "0 0 40px hsl(217 91% 60% / 0.1)"
                     : "0 0 40px hsl(142 71% 45% / 0.1)"
                 }}
               >
                 {/* Avatar placeholder */}
-                <div 
-                  className={`w-20 h-20 rounded-2xl mb-4 flex items-center justify-center text-2xl font-bold ${
-                    member.color === "primary" 
-                      ? "bg-primary/20 text-primary" 
+                <div
+                  className={`w-20 h-20 rounded-2xl mb-4 flex items-center justify-center text-2xl font-bold ${member.color_theme === "primary"
+                      ? "bg-primary/20 text-primary"
                       : "bg-secondary/20 text-secondary"
-                  }`}
+                    }`}
                 >
-                  {member.name.split(" ").map(n => n[0]).join("")}
+                  {member.avatar_url ? (
+                    <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover rounded-2xl" />
+                  ) : (
+                    member.name.split(" ").map(n => n[0]).join("")
+                  )}
                 </div>
 
                 <h3 className="text-xl font-bold mb-1">{member.name}</h3>
-                <div 
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 ${
-                    member.color === "primary"
+                <div
+                  className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 ${member.color_theme === "primary"
                       ? "bg-primary/20 text-primary"
                       : "bg-secondary/20 text-secondary"
-                  }`}
+                    }`}
                 >
                   {member.role}
                 </div>
@@ -211,19 +223,18 @@ const TeamSection = () => {
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-border">
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href={member.github_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
                     <Github size={18} />
                   </a>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href={member.linkedin_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
                     <Linkedin size={18} />
                   </a>
                 </div>
 
                 {/* Hover glow effect */}
-                <div 
-                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl ${
-                    member.color === "primary" ? "glow-primary" : "glow-secondary"
-                  }`} 
+                <div
+                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl ${member.color_theme === "primary" ? "glow-primary" : "glow-secondary"
+                    }`}
                 />
               </div>
             ))}

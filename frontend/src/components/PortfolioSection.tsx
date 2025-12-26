@@ -2,66 +2,50 @@ import { ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getPortfolioProjects, fallbackPortfolio, PortfolioProject } from "@/lib/api";
 import projectImage1 from "@/assets/project-dashboard-1.png";
 import projectImage2 from "@/assets/project-dashboard-2.png";
 import projectImage3 from "@/assets/project-dashboard-3.png";
 
-const projects = [
-  {
-    id: 1,
-    title: "AI Traffic Management System",
-    description: "Real-time traffic analysis using computer vision and ML algorithms to optimize urban traffic flow and reduce congestion.",
-    image: projectImage1,
-    tags: ["Python", "TensorFlow", "OpenCV"],
-  },
-  {
-    id: 2,
-    title: "Smart Campus Navigation",
-    description: "Indoor navigation app featuring AR waypoints and comprehensive accessibility features for university campus wayfinding.",
-    image: projectImage2,
-    tags: ["Flutter", "Firebase", "ARCore"],
-  },
-  {
-    id: 3,
-    title: "E-Commerce Analytics Platform",
-    description: "Full-stack analytics dashboard with predictive insights for inventory management and accurate sales forecasting tools.",
-    image: projectImage3,
-    tags: ["React", "Django", "PostgreSQL"],
-  },
-  {
-    id: 4,
-    title: "Healthcare Appointment System",
-    description: "Comprehensive patient management system with real-time scheduling, automated reminders, and medical records tracking.",
-    image: projectImage1,
-    tags: ["React", "Node.js", "MongoDB"],
-  },
-  {
-    id: 5,
-    title: "Smart Inventory Tracker",
-    description: "IoT-enabled inventory management platform with barcode scanning, stock alerts, and real-time analytics dashboard.",
-    image: projectImage2,
-    tags: ["Python", "Flask", "MySQL"],
-  },
-  {
-    id: 6,
-    title: "Student Portal System",
-    description: "Comprehensive student management portal with grades tracking, attendance monitoring, and seamless course registration.",
-    image: projectImage3,
-    tags: ["Java", "Spring Boot", "PostgreSQL"],
-  },
-];
+// Fallback images for when no image_url is provided
+const fallbackImages = [projectImage1, projectImage2, projectImage3];
 
 const PortfolioSection = () => {
   const isMobile = useIsMobile();
-  const [cardOrder, setCardOrder] = useState(projects.map((_, i) => i));
+  const [cardOrder, setCardOrder] = useState<number[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Fetch portfolio projects from API
+  const { data: projects = fallbackPortfolio, isLoading } = useQuery<PortfolioProject[]>({
+    queryKey: ['portfolio'],
+    queryFn: getPortfolioProjects,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Initialize card order when projects change
+  useState(() => {
+    if (projects.length > 0 && cardOrder.length === 0) {
+      setCardOrder(projects.map((_, i) => i));
+    }
+  });
+
+  // Update card order when projects change
+  if (projects.length > 0 && cardOrder.length !== projects.length) {
+    setCardOrder(projects.map((_, i) => i));
+  }
+
+  const getProjectImage = (project: PortfolioProject, index: number) => {
+    if (project.image_url) return project.image_url;
+    return fallbackImages[index % fallbackImages.length];
+  };
+
   const handleSwipe = () => {
     if (isAnimating) return;
     setIsAnimating(true);
-    
+
     // Move top card to bottom of stack
     setTimeout(() => {
       setCardOrder((prev) => {
@@ -94,6 +78,21 @@ const PortfolioSection = () => {
     touchStartRef.current = null;
   };
 
+  if (isLoading) {
+    return (
+      <section id="portfolio" className="py-16 sm:py-20 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">
+              Our Projects that <span className="text-gradient">brings ideas to reality</span>.
+            </h2>
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="portfolio" className="py-16 sm:py-20 lg:py-24 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6">
@@ -110,7 +109,7 @@ const PortfolioSection = () => {
       {/* Mobile: Swipeable card stack */}
       {isMobile ? (
         <div className="container mx-auto px-4">
-          <div 
+          <div
             className="relative h-[520px] flex items-center justify-center"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -118,9 +117,10 @@ const PortfolioSection = () => {
           >
             {cardOrder.map((projectIndex, stackIndex) => {
               const project = projects[projectIndex];
+              if (!project) return null;
               const isTop = stackIndex === 0;
               const offset = Math.min(stackIndex, 4); // Only show 5 cards in stack
-              
+
               if (stackIndex > 4) return null;
 
               return (
@@ -139,7 +139,7 @@ const PortfolioSection = () => {
                   {/* Image - Top */}
                   <div className="relative aspect-video overflow-hidden flex-shrink-0">
                     <img
-                      src={project.image}
+                      src={getProjectImage(project, projectIndex)}
                       alt={project.title}
                       className="w-full h-full object-cover"
                     />
@@ -159,7 +159,7 @@ const PortfolioSection = () => {
                         {project.description}
                       </p>
                     </div>
-                    
+
                     {/* Tech Stack - Bottom */}
                     <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border/30">
                       {project.tags.map((tag) => (
@@ -193,7 +193,7 @@ const PortfolioSection = () => {
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img
-                    src={project.image}
+                    src={getProjectImage(project, index % projects.length)}
                     alt={project.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { submitContactForm } from "@/lib/api";
 
 const ContactModal = () => {
   const { isOpen, closeModal } = useContactModal();
@@ -48,13 +49,22 @@ const ContactModal = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-    setFormData({ name: "", phone: "", email: "", message: "" });
-    closeModal();
-    toast.success("Request Sent! We'll contact you shortly.");
+    try {
+      await submitContactForm({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        phone: formData.phone,
+      });
+      setFormData({ name: "", phone: "", email: "", message: "" });
+      closeModal();
+      toast.success("Request Sent! We'll contact you shortly.");
+    } catch (error) {
+      console.error("Contact form error:", error);
+      toast.error("Failed to send request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -75,11 +85,10 @@ const ContactModal = () => {
 
       {/* Modal */}
       <div
-        className={`relative z-10 w-full max-w-md ${
-          isMobile
+        className={`relative z-10 w-full max-w-md ${isMobile
             ? "animate-slide-up rounded-2xl mb-0 max-h-[85vh] overflow-y-auto"
             : "animate-scale-in rounded-2xl"
-        }`}
+          }`}
       >
         <div className="glass-card rounded-2xl border border-primary/20 shadow-2xl overflow-hidden">
           {/* Glow effect */}

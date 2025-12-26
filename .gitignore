@@ -29,7 +29,6 @@ __pycache__/
 .Python
 venv/
 backend/venv/
-backend/migrations/
 ENV/
 env/
 .venv/
