@@ -32,8 +32,8 @@ project-forge/
 ### 1. Clone and Setup Environment
 
 ```bash
-# Copy environment template
-cp .env.example .env
+# Add environment template
+ni .env
 # Edit .env with your Supabase credentials
 ```
 
@@ -98,7 +98,7 @@ Access at `/admin` with configured credentials:
 
 ## Environment Variables
 
-See `.env.example` for all required variables:
+All required environment variables:
 
 ```env
 SUPABASE_URL=your_supabase_url
