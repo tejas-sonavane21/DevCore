@@ -1,0 +1,46 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+instance/
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Node.js / Frontend
+node_modules/
+dist/
+build/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Temporary / Scratchpad Files
+fix_css.txt
+concept.txt
+task*.txt
+how_to_run.txt
+task1_high_priority.txt
+task2.txt
+*.log
+
