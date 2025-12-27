@@ -10,14 +10,14 @@ const ProcessTimeline = () => {
     },
     {
       icon: Code,
-      title: "We Code & Document",
-      description: "Our team builds your project with clean, well-documented code you can actually understand.",
+      title: "We Develop the Core",
+      description: "Our team builds your project with clean, commented code that is structured for you to easily understand.",
       step: "02",
     },
     {
       icon: Rocket,
-      title: "Deployment & Viva Prep",
-      description: "We help you deploy, walk you through the code, and prepare you for any questions.",
+      title: "Complete Setup & Documentation",
+      description: "We handle cloud deployment, ensure the code runs perfectly on your local machine, and provide full project documentation.",
       step: "03",
     },
   ];
@@ -30,7 +30,7 @@ const ProcessTimeline = () => {
             How It <span className="text-gradient">Works</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            From idea to viva-ready in three simple steps
+            Your Complete Project Solution in 3 Simple Steps
           </p>
         </div>
 
@@ -41,9 +41,8 @@ const ProcessTimeline = () => {
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`relative flex items-start gap-6 mb-12 last:mb-0 ${
-                index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-              }`}
+              className={`relative flex items-start gap-6 mb-12 last:mb-0 ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                }`}
             >
               {/* Step number circle */}
               <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 z-10">

@@ -7,8 +7,8 @@ const ValueProposition = () => {
       us: "100% custom logic built fresh",
     },
     {
-      others: "Zero post-delivery support",
-      us: "Full explanation & viva prep",
+      others: "Zero support or setup",
+      us: "Deployment, Local Setup & Documentation",
     },
     {
       others: "Confusing undocumented mess",

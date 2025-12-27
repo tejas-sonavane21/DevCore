@@ -148,7 +148,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     {/* Logo */}
                     <div className="p-6 border-b border-border">
                         <Link to="/admin" className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-gradient">Project Forge</span>
+                            <span className="text-xl font-bold text-gradient">DevForge</span>
                         </Link>
                         <span className="text-xs text-muted-foreground">Admin Panel</span>
                     </div>
@@ -161,8 +161,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                                 to={item.path}
                                 onClick={() => setSidebarOpen(false)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path, item.exact)
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                             >
                                 <item.icon size={20} />

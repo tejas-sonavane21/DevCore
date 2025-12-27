@@ -84,7 +84,7 @@ const ProjectIdeas = () => {
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg">
               Browse our curated collection of final year project ideas. Each template comes with
-              complete documentation, modern tech stack, and viva preparation support.
+              complete documentation, modern tech stack, and deployment-ready code.
             </p>
           </div>
         </div>

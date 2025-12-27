@@ -32,7 +32,7 @@ const HeroSection = () => {
             </h1>
 
             <p className="text-base sm:text-lg text-muted-foreground mb-8 max-w-lg mx-auto lg:mx-0">
-              Expert-led custom projects for Computer Science students. No templates, 
+              Expert-led custom projects for Computer Science students. No templates,
               just clean, bug-free code built by senior developers.
             </p>
 
@@ -43,9 +43,9 @@ const HeroSection = () => {
                   <ArrowRight size={18} />
                 </Link>
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
+              <Button
+                variant="outline"
+                size="lg"
                 className="gap-2 border-border hover:bg-muted/50 min-h-[44px]"
                 onClick={openModal}
               >
@@ -56,13 +56,13 @@ const HeroSection = () => {
 
             <div className="mt-10 flex items-center gap-6 sm:gap-8 justify-center lg:justify-start">
               <div>
-                <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+                <div className="text-2xl sm:text-3xl font-bold text-primary">25+</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Projects Delivered</div>
               </div>
               <div className="w-px h-10 sm:h-12 bg-border" />
               <div>
                 <div className="text-2xl sm:text-3xl font-bold text-secondary">100%</div>
-                <div className="text-xs sm:text-sm text-muted-foreground">Viva Success Rate</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Customer Satisfaction Rate</div>
               </div>
               <div className="w-px h-10 sm:h-12 bg-border hidden sm:block" />
               <div className="hidden sm:block">

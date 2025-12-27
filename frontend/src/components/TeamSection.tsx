@@ -91,7 +91,7 @@ const TeamSection = () => {
               Meet the <span className="text-gradient">Builders</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Three friends who turned their passion for clean code into a mission to help students succeed.
+              Developers by profession, mentors by passion. We are on a mission to make your project submission stress-free.
             </p>
           </div>
           <div className="flex justify-center">
@@ -115,7 +115,7 @@ const TeamSection = () => {
             Meet the <span className="text-gradient">Builders</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Three friends who turned their passion for clean code into a mission to help students succeed.
+            Developers by profession, mentors by passion. We are on a mission to make your project submission stress-free.
           </p>
         </div>
 
@@ -149,21 +149,29 @@ const TeamSection = () => {
                       : "0 0 40px hsl(142 71% 45% / 0.15)"
                   }}
                 >
-                  {/* Avatar placeholder */}
-                  <div
-                    className={`w-16 h-16 rounded-2xl mb-4 flex items-center justify-center text-xl font-bold ${color === "primary"
+                  {/* Avatar */}
+                  {member.avatar_url ? (
+                    <img
+                      src={member.avatar_url}
+                      alt={member.name}
+                      className="w-16 h-16 rounded-2xl mb-4 object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`w-16 h-16 rounded-2xl mb-4 flex items-center justify-center text-xl font-bold ${color === "primary"
                         ? "bg-primary/20 text-primary"
                         : "bg-secondary/20 text-secondary"
-                      }`}
-                  >
-                    {member.name.split(" ").map(n => n[0]).join("")}
-                  </div>
+                        }`}
+                    >
+                      {member.name.split(" ").map(n => n[0]).join("")}
+                    </div>
+                  )}
 
                   <h3 className="text-lg font-bold mb-1">{member.name}</h3>
                   <div
                     className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${color === "primary"
-                        ? "bg-primary/20 text-primary"
-                        : "bg-secondary/20 text-secondary"
+                      ? "bg-primary/20 text-primary"
+                      : "bg-secondary/20 text-secondary"
                       }`}
                   >
                     {member.role}
@@ -206,21 +214,29 @@ const TeamSection = () => {
                       : "0 0 40px hsl(142 71% 45% / 0.1)"
                   }}
                 >
-                  {/* Avatar placeholder */}
-                  <div
-                    className={`w-20 h-20 rounded-2xl mb-4 flex items-center justify-center text-2xl font-bold ${color === "primary"
+                  {/* Avatar */}
+                  {member.avatar_url ? (
+                    <img
+                      src={member.avatar_url}
+                      alt={member.name}
+                      className="w-20 h-20 rounded-2xl mb-4 object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`w-20 h-20 rounded-2xl mb-4 flex items-center justify-center text-2xl font-bold ${color === "primary"
                         ? "bg-primary/20 text-primary"
                         : "bg-secondary/20 text-secondary"
-                      }`}
-                  >
-                    {member.name.split(" ").map(n => n[0]).join("")}
-                  </div>
+                        }`}
+                    >
+                      {member.name.split(" ").map(n => n[0]).join("")}
+                    </div>
+                  )}
 
                   <h3 className="text-xl font-bold mb-1">{member.name}</h3>
                   <div
                     className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 ${color === "primary"
-                        ? "bg-primary/20 text-primary"
-                        : "bg-secondary/20 text-secondary"
+                      ? "bg-primary/20 text-primary"
+                      : "bg-secondary/20 text-secondary"
                       }`}
                   >
                     {member.role}

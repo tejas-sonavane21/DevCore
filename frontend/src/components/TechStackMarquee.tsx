@@ -4,12 +4,18 @@ const TechStackMarquee = () => {
     { name: "Django", icon: "🎯" },
     { name: "React", icon: "⚛️" },
     { name: "MySQL", icon: "🗄️" },
-    { name: "Flutter", icon: "📱" },
-    { name: "Java", icon: "☕" },
+    { name: "HTML", icon: "🌐" },
+    { name: "Bootstrap", icon: "🅱️" },
+    { name: "CSS", icon: "🎨" },
+    { name: "Tailwind CSS", icon: "📐" },
+    { name: "JavaScript", icon: "📜" },
     { name: "TypeScript", icon: "📘" },
     { name: "PostgreSQL", icon: "🐘" },
     { name: "Node.js", icon: "🟢" },
     { name: "MongoDB", icon: "🍃" },
+    { name: "Docker", icon: "🐳" },
+    { name: "Git", icon: "🌱" },
+    { name: "GitHub", icon: "🌱" },
   ];
 
   return (
