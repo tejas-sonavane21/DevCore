@@ -12,7 +12,7 @@ def get_templates():
     """Get all project templates."""
     try:
         supabase = get_supabase_client()
-        response = supabase.table('project_templates').select('*').order('created_at', desc=True).execute()
+        response = supabase.table('project_templates').select('*').order('display_order', nullsfirst=False).order('created_at', desc=True).execute()
         return jsonify({'success': True, 'data': response.data}), 200
     except Exception as e:
         print(f"ERROR in /api/templates: {str(e)}")
@@ -40,7 +40,7 @@ def get_portfolio():
     """Get all portfolio projects."""
     try:
         supabase = get_supabase_client()
-        response = supabase.table('portfolio_projects').select('*').order('created_at', desc=True).execute()
+        response = supabase.table('portfolio_projects').select('*').order('display_order', nullsfirst=False).order('created_at', desc=True).execute()
         return jsonify({'success': True, 'data': response.data}), 200
     except Exception as e:
         print(f"ERROR in /api/portfolio: {str(e)}")

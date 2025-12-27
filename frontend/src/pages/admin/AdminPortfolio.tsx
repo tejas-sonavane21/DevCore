@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -21,6 +22,7 @@ interface PortfolioProject {
     live_link: string | null;
     github_link: string | null;
     is_featured: boolean;
+    display_order?: number;
 }
 
 const emptyProject: Partial<PortfolioProject> = {
@@ -38,6 +40,8 @@ const AdminPortfolio = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Partial<PortfolioProject> | null>(null);
     const [tagsInput, setTagsInput] = useState('');
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
     const { data: projects = [], isLoading } = useQuery<PortfolioProject[]>({
         queryKey: ['admin', 'portfolio'],
@@ -91,6 +95,20 @@ const AdminPortfolio = () => {
         },
     });
 
+    const reorderMutation = useMutation({
+        mutationFn: async (order: string[]) => {
+            const res = await fetch(`${API_BASE_URL}/admin/portfolio/reorder`, {
+                method: 'POST',
+                headers: getAuthHeader(),
+                body: JSON.stringify({ order }),
+            });
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'portfolio'] });
+        },
+    });
+
     const openCreateModal = () => {
         setEditingProject({ ...emptyProject });
         setTagsInput('');
@@ -130,12 +148,64 @@ const AdminPortfolio = () => {
         }
     };
 
+    // Drag and drop handlers
+    const handleDragStart = (e: React.DragEvent, index: number) => {
+        setDraggedIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', index.toString());
+        // Add a slight delay to allow the dragged element styling
+        setTimeout(() => {
+            (e.target as HTMLElement).style.opacity = '0.5';
+        }, 0);
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        (e.target as HTMLElement).style.opacity = '1';
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (dragOverIndex !== index) {
+            setDragOverIndex(index);
+        }
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+        e.preventDefault();
+        const dragIndex = draggedIndex;
+
+        if (dragIndex === null || dragIndex === dropIndex) {
+            setDraggedIndex(null);
+            setDragOverIndex(null);
+            return;
+        }
+
+        // Reorder the array
+        const newOrder = [...projects];
+        const [draggedItem] = newOrder.splice(dragIndex, 1);
+        newOrder.splice(dropIndex, 0, draggedItem);
+
+        // Send new order to backend
+        const orderIds = newOrder.map(p => p.id);
+        reorderMutation.mutate(orderIds);
+
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
     return (
         <div>
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Portfolio Projects</h1>
-                    <p className="text-muted-foreground">Manage completed portfolio projects</p>
+                    <p className="text-muted-foreground">Manage completed portfolio projects. Drag to reorder.</p>
                 </div>
                 <Button variant="glow" onClick={openCreateModal}>
                     <Plus size={18} className="mr-2" />
@@ -150,14 +220,30 @@ const AdminPortfolio = () => {
                     No projects yet. Click "Add Project" to create one.
                 </div>
             ) : (
-                <div className="grid gap-4">
-                    {projects.map((project) => (
-                        <div key={project.id} className="glass-card rounded-xl p-4 flex items-center gap-4">
+                <div className="grid gap-2">
+                    {projects.map((project, index) => (
+                        <div
+                            key={project.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragEnd={handleDragEnd}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, index)}
+                            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-grab active:cursor-grabbing transition-all duration-200
+                                ${dragOverIndex === index ? 'border-2 border-primary border-dashed bg-primary/5' : ''}
+                                ${draggedIndex === index ? 'opacity-50' : ''}`}
+                        >
+                            {/* Drag Handle */}
+                            <div className="flex-shrink-0 text-muted-foreground hover:text-foreground cursor-grab">
+                                <GripVertical size={20} />
+                            </div>
+
                             {project.image_url && (
                                 <img
                                     src={project.image_url}
                                     alt={project.title}
-                                    className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                                    className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                                 />
                             )}
                             <div className="flex-1 min-w-0">
@@ -242,11 +328,12 @@ const AdminPortfolio = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium mb-1 block">Image URL</label>
-                                <Input
-                                    value={editingProject.image_url || ''}
-                                    onChange={(e) => setEditingProject({ ...editingProject, image_url: e.target.value })}
-                                    placeholder="https://..."
+                                <label className="text-sm font-medium mb-1 block">Image</label>
+                                <ImageUpload
+                                    value={editingProject.image_url || null}
+                                    onChange={(url) => setEditingProject({ ...editingProject, image_url: url || '' })}
+                                    bucket="images"
+                                    folder="portfolio"
                                 />
                             </div>
 

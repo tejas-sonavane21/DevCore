@@ -75,6 +75,10 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
     submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Add display_order column to portfolio_projects and project_templates
+ALTER TABLE portfolio_projects ADD COLUMN display_order INTEGER DEFAULT 0;
+ALTER TABLE project_templates ADD COLUMN display_order INTEGER DEFAULT 0;
+
 -- =====================================================
 -- Indexes for better query performance
 -- =====================================================

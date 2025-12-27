@@ -39,7 +39,7 @@ def list_templates():
     """List all project templates."""
     try:
         supabase = get_supabase_admin_client()
-        response = supabase.table('project_templates').select('*').order('created_at', desc=True).execute()
+        response = supabase.table('project_templates').select('*').order('display_order', nullsfirst=False).order('created_at', desc=True).execute()
         return jsonify({'success': True, 'data': response.data}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -83,6 +83,24 @@ def delete_template(template_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/templates/reorder', methods=['POST'])
+@requires_auth
+def reorder_templates():
+    """Reorder project templates by updating display_order."""
+    try:
+        data = request.get_json()
+        order = data.get('order', [])  # List of IDs in new order
+        
+        supabase = get_supabase_admin_client()
+        
+        for index, template_id in enumerate(order):
+            supabase.table('project_templates').update({'display_order': index}).eq('id', template_id).execute()
+        
+        return jsonify({'success': True, 'message': 'Order updated'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== Portfolio Projects CRUD ====================
 
 @admin_bp.route('/portfolio', methods=['GET'])
@@ -91,7 +109,7 @@ def list_portfolio():
     """List all portfolio projects."""
     try:
         supabase = get_supabase_admin_client()
-        response = supabase.table('portfolio_projects').select('*').order('created_at', desc=True).execute()
+        response = supabase.table('portfolio_projects').select('*').order('display_order', nullsfirst=False).order('created_at', desc=True).execute()
         return jsonify({'success': True, 'data': response.data}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -131,6 +149,24 @@ def delete_portfolio(project_id):
         supabase = get_supabase_admin_client()
         supabase.table('portfolio_projects').delete().eq('id', project_id).execute()
         return jsonify({'success': True, 'message': 'Project deleted'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/portfolio/reorder', methods=['POST'])
+@requires_auth
+def reorder_portfolio():
+    """Reorder portfolio projects by updating display_order."""
+    try:
+        data = request.get_json()
+        order = data.get('order', [])  # List of IDs in new order
+        
+        supabase = get_supabase_admin_client()
+        
+        for index, project_id in enumerate(order):
+            supabase.table('portfolio_projects').update({'display_order': index}).eq('id', project_id).execute()
+        
+        return jsonify({'success': True, 'message': 'Order updated'}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -239,26 +275,34 @@ def upload_image():
         if file.filename == '':
             return jsonify({'success': False, 'error': 'No file selected'}), 400
         
-        # Get the bucket name from query params (default: 'images')
+        # Get the bucket name and folder from query params
         bucket = request.args.get('bucket', 'images')
+        folder = request.args.get('folder', '')  # e.g., 'portfolio', 'templates', 'team'
         
         supabase = get_supabase_admin_client()
         
-        # Generate unique filename
+        # Generate unique filename with folder path
         import uuid
         ext = file.filename.rsplit('.', 1)[-1] if '.' in file.filename else 'png'
         filename = f"{uuid.uuid4()}.{ext}"
         
+        # Create full path with folder if provided
+        if folder:
+            filepath = f"{folder}/{filename}"
+        else:
+            filepath = filename
+        
         # Upload to Supabase Storage
         response = supabase.storage.from_(bucket).upload(
-            filename,
+            filepath,
             file.read(),
             {'content-type': file.content_type}
         )
         
         # Get public URL
-        public_url = supabase.storage.from_(bucket).get_public_url(filename)
+        public_url = supabase.storage.from_(bucket).get_public_url(filepath)
         
-        return jsonify({'success': True, 'url': public_url, 'filename': filename}), 201
+        return jsonify({'success': True, 'url': public_url, 'filename': filepath}), 201
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+

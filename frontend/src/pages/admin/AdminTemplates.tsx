@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -22,6 +23,7 @@ interface Template {
     features: string[];
     live_preview_url: string | null;
     is_featured: boolean;
+    display_order?: number;
 }
 
 const emptyTemplate: Partial<Template> = {
@@ -41,6 +43,8 @@ const AdminTemplates = () => {
     const [editingTemplate, setEditingTemplate] = useState<Partial<Template> | null>(null);
     const [tagsInput, setTagsInput] = useState('');
     const [featuresInput, setFeaturesInput] = useState('');
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
     // Fetch templates
     const { data: templates = [], isLoading } = useQuery<Template[]>({
@@ -98,6 +102,21 @@ const AdminTemplates = () => {
         },
     });
 
+    // Reorder mutation
+    const reorderMutation = useMutation({
+        mutationFn: async (order: string[]) => {
+            const res = await fetch(`${API_BASE_URL}/admin/templates/reorder`, {
+                method: 'POST',
+                headers: getAuthHeader(),
+                body: JSON.stringify({ order }),
+            });
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'templates'] });
+        },
+    });
+
     const openCreateModal = () => {
         setEditingTemplate({ ...emptyTemplate });
         setTagsInput('');
@@ -140,12 +159,63 @@ const AdminTemplates = () => {
         }
     };
 
+    // Drag and drop handlers
+    const handleDragStart = (e: React.DragEvent, index: number) => {
+        setDraggedIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', index.toString());
+        setTimeout(() => {
+            (e.target as HTMLElement).style.opacity = '0.5';
+        }, 0);
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        (e.target as HTMLElement).style.opacity = '1';
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (dragOverIndex !== index) {
+            setDragOverIndex(index);
+        }
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+        e.preventDefault();
+        const dragIndex = draggedIndex;
+
+        if (dragIndex === null || dragIndex === dropIndex) {
+            setDraggedIndex(null);
+            setDragOverIndex(null);
+            return;
+        }
+
+        // Reorder the array
+        const newOrder = [...templates];
+        const [draggedItem] = newOrder.splice(dragIndex, 1);
+        newOrder.splice(dropIndex, 0, draggedItem);
+
+        // Send new order to backend
+        const orderIds = newOrder.map(t => t.id);
+        reorderMutation.mutate(orderIds);
+
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
     return (
         <div>
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Project Templates</h1>
-                    <p className="text-muted-foreground">Manage project templates and ideas</p>
+                    <p className="text-muted-foreground">Manage project templates and ideas. Drag to reorder.</p>
                 </div>
                 <Button variant="glow" onClick={openCreateModal}>
                     <Plus size={18} className="mr-2" />
@@ -160,22 +230,38 @@ const AdminTemplates = () => {
                     No templates yet. Click "Add Template" to create one.
                 </div>
             ) : (
-                <div className="grid gap-4">
-                    {templates.map((template) => (
-                        <div key={template.id} className="glass-card rounded-xl p-4 flex items-center gap-4">
+                <div className="grid gap-2">
+                    {templates.map((template, index) => (
+                        <div
+                            key={template.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragEnd={handleDragEnd}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, index)}
+                            className={`glass-card rounded-xl p-4 flex items-center gap-4 cursor-grab active:cursor-grabbing transition-all duration-200
+                                ${dragOverIndex === index ? 'border-2 border-primary border-dashed bg-primary/5' : ''}
+                                ${draggedIndex === index ? 'opacity-50' : ''}`}
+                        >
+                            {/* Drag Handle */}
+                            <div className="flex-shrink-0 text-muted-foreground hover:text-foreground cursor-grab">
+                                <GripVertical size={20} />
+                            </div>
+
                             {template.image_url && (
                                 <img
                                     src={template.image_url}
                                     alt={template.title}
-                                    className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                                    className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                                 />
                             )}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                     <h3 className="font-bold truncate">{template.title}</h3>
                                     <span className={`px-2 py-0.5 text-xs rounded-full ${template.difficulty === 'Beginner' ? 'bg-secondary/20 text-secondary' :
-                                            template.difficulty === 'Intermediate' ? 'bg-primary/20 text-primary' :
-                                                'bg-accent/20 text-accent'
+                                        template.difficulty === 'Intermediate' ? 'bg-primary/20 text-primary' :
+                                            'bg-accent/20 text-accent'
                                         }`}>
                                         {template.difficulty}
                                     </span>
@@ -275,11 +361,12 @@ const AdminTemplates = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium mb-1 block">Image URL</label>
-                                <Input
-                                    value={editingTemplate.image_url || ''}
-                                    onChange={(e) => setEditingTemplate({ ...editingTemplate, image_url: e.target.value })}
-                                    placeholder="https://..."
+                                <label className="text-sm font-medium mb-1 block">Image</label>
+                                <ImageUpload
+                                    value={editingTemplate.image_url || null}
+                                    onChange={(url) => setEditingTemplate({ ...editingTemplate, image_url: url || '' })}
+                                    bucket="images"
+                                    folder="templates"
                                 />
                             </div>
 

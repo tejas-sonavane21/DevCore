@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -160,8 +161,8 @@ const AdminTeam = () => {
                             <div className="flex items-start justify-between mb-4">
                                 <div
                                     className={`w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold ${member.color_theme === 'primary'
-                                            ? 'bg-primary/20 text-primary'
-                                            : 'bg-secondary/20 text-secondary'
+                                        ? 'bg-primary/20 text-primary'
+                                        : 'bg-secondary/20 text-secondary'
                                         }`}
                                 >
                                     {member.avatar_url ? (
@@ -186,8 +187,8 @@ const AdminTeam = () => {
                             </div>
                             <h3 className="font-bold mb-1">{member.name}</h3>
                             <span className={`inline-block px-2 py-0.5 text-xs rounded-full mb-2 ${member.color_theme === 'primary'
-                                    ? 'bg-primary/20 text-primary'
-                                    : 'bg-secondary/20 text-secondary'
+                                ? 'bg-primary/20 text-primary'
+                                : 'bg-secondary/20 text-secondary'
                                 }`}>
                                 {member.role}
                             </span>
@@ -271,11 +272,12 @@ const AdminTeam = () => {
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium mb-1 block">Avatar URL</label>
-                                <Input
-                                    value={editingMember.avatar_url || ''}
-                                    onChange={(e) => setEditingMember({ ...editingMember, avatar_url: e.target.value })}
-                                    placeholder="https://..."
+                                <label className="text-sm font-medium mb-1 block">Avatar Image</label>
+                                <ImageUpload
+                                    value={editingMember.avatar_url || null}
+                                    onChange={(url) => setEditingMember({ ...editingMember, avatar_url: url || '' })}
+                                    bucket="images"
+                                    folder="team"
                                 />
                             </div>
 
