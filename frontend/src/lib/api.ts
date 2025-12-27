@@ -10,7 +10,6 @@ export interface PortfolioProject {
     image_url: string | null;
     tags: string[];
     live_link: string | null;
-    github_link: string | null;
     is_featured: boolean;
     created_at: string;
 }
@@ -22,7 +21,6 @@ export interface ProjectTemplate {
     image_url: string | null;
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
     tags: string[];
-    features: string[];
     live_preview_url: string | null;
     is_featured: boolean;
     created_at: string;

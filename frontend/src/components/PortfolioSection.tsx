@@ -135,7 +135,8 @@ const PortfolioSection = () => {
               return (
                 <Card
                   key={project.id}
-                  className="glass-card overflow-hidden absolute w-[90%] max-w-[340px] min-h-[440px] flex flex-col transition-all duration-300 ease-out"
+                  className={`glass-card overflow-hidden absolute w-[90%] max-w-[340px] min-h-[440px] flex flex-col transition-all duration-300 ease-out ${project.live_link ? 'cursor-pointer' : ''}`}
+                  onClick={() => project.live_link && window.open(project.live_link, '_blank', 'noopener,noreferrer')}
                   style={{
                     transform: isTop
                       ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg) ${isAnimating ? 'translateX(120%) rotate(15deg)' : ''}`
@@ -199,6 +200,7 @@ const PortfolioSection = () => {
               <Card
                 key={`${project.id}-${index}`}
                 className="group glass-card overflow-hidden hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer flex-shrink-0 w-[320px] sm:w-[380px] mx-3 sm:mx-4"
+                onClick={() => project.live_link && window.open(project.live_link, '_blank', 'noopener,noreferrer')}
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img

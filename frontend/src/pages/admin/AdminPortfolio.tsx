@@ -20,7 +20,6 @@ interface PortfolioProject {
     image_url: string | null;
     tags: string[];
     live_link: string | null;
-    github_link: string | null;
     is_featured: boolean;
     display_order?: number;
 }
@@ -31,7 +30,6 @@ const emptyProject: Partial<PortfolioProject> = {
     image_url: '',
     tags: [],
     live_link: '',
-    github_link: '',
     is_featured: false,
 };
 
@@ -337,23 +335,13 @@ const AdminPortfolio = () => {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-sm font-medium mb-1 block">Live Link</label>
-                                    <Input
-                                        value={editingProject.live_link || ''}
-                                        onChange={(e) => setEditingProject({ ...editingProject, live_link: e.target.value })}
-                                        placeholder="https://..."
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-medium mb-1 block">GitHub Link</label>
-                                    <Input
-                                        value={editingProject.github_link || ''}
-                                        onChange={(e) => setEditingProject({ ...editingProject, github_link: e.target.value })}
-                                        placeholder="https://github.com/..."
-                                    />
-                                </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">Live Link</label>
+                                <Input
+                                    value={editingProject.live_link || ''}
+                                    onChange={(e) => setEditingProject({ ...editingProject, live_link: e.target.value })}
+                                    placeholder="https://..."
+                                />
                             </div>
 
                             <div>

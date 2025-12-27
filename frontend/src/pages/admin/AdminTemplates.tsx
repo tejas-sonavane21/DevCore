@@ -20,7 +20,6 @@ interface Template {
     image_url: string | null;
     difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
     tags: string[];
-    features: string[];
     live_preview_url: string | null;
     is_featured: boolean;
     display_order?: number;
@@ -32,7 +31,6 @@ const emptyTemplate: Partial<Template> = {
     image_url: '',
     difficulty: 'Intermediate',
     tags: [],
-    features: [],
     live_preview_url: '',
     is_featured: false,
 };
@@ -42,7 +40,6 @@ const AdminTemplates = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState<Partial<Template> | null>(null);
     const [tagsInput, setTagsInput] = useState('');
-    const [featuresInput, setFeaturesInput] = useState('');
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
@@ -120,14 +117,12 @@ const AdminTemplates = () => {
     const openCreateModal = () => {
         setEditingTemplate({ ...emptyTemplate });
         setTagsInput('');
-        setFeaturesInput('');
         setIsModalOpen(true);
     };
 
     const openEditModal = (template: Template) => {
         setEditingTemplate({ ...template });
         setTagsInput(template.tags.join(', '));
-        setFeaturesInput(template.features.join(', '));
         setIsModalOpen(true);
     };
 
@@ -143,7 +138,6 @@ const AdminTemplates = () => {
         const templateData = {
             ...editingTemplate,
             tags: tagsInput.split(',').map(t => t.trim()).filter(Boolean),
-            features: featuresInput.split(',').map(f => f.trim()).filter(Boolean),
         };
 
         if (editingTemplate.id) {
@@ -388,14 +382,7 @@ const AdminTemplates = () => {
                                 />
                             </div>
 
-                            <div>
-                                <label className="text-sm font-medium mb-1 block">Features (comma-separated)</label>
-                                <Input
-                                    value={featuresInput}
-                                    onChange={(e) => setFeaturesInput(e.target.value)}
-                                    placeholder="Feature 1, Feature 2"
-                                />
-                            </div>
+
 
                             <div className="flex gap-3 pt-4">
                                 <Button type="button" variant="outline" onClick={closeModal} className="flex-1">
