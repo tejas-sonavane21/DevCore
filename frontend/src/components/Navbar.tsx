@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useContactModal } from "@/contexts/ContactModalContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { openModal } = useContactModal();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Services", href: "#services" },
@@ -15,6 +17,32 @@ const Navbar = () => {
     { name: "Tech Stack", href: "#tech" },
     { name: "Contact", href: "#contact" },
   ];
+
+  // Handle navigation to home page sections from any page
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const sectionId = href.replace("#", "");
+
+    // If already on home page, just scroll to section
+    if (location.pathname === "/") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to home page with hash, then scroll after navigation
+      navigate(`/${href}`);
+      // Small delay to allow page to load before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+
+    setIsOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border">
@@ -29,8 +57,9 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <a
                 key={link.name}
-                href={link.href}
-                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm lg:text-base"
+                href={`/${link.href}`}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm lg:text-base cursor-pointer"
               >
                 {link.name}
               </a>
@@ -56,9 +85,9 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <a
                 key={link.name}
-                href={link.href}
-                className="text-muted-foreground hover:text-primary hover:bg-muted/30 transition-colors py-3 px-4 rounded-lg font-medium min-h-[44px] flex items-center"
-                onClick={() => setIsOpen(false)}
+                href={`/${link.href}`}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-muted-foreground hover:text-primary hover:bg-muted/30 transition-colors py-3 px-4 rounded-lg font-medium min-h-[44px] flex items-center cursor-pointer"
               >
                 {link.name}
               </a>

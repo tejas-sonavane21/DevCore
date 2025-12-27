@@ -87,8 +87,8 @@ const ContactModal = () => {
       {/* Modal */}
       <div
         className={`relative z-10 w-full max-w-md ${isMobile
-            ? "animate-slide-up rounded-2xl mb-0 max-h-[85vh] overflow-y-auto"
-            : "animate-scale-in rounded-2xl"
+          ? "animate-slide-up rounded-2xl mb-0 max-h-[85vh] overflow-y-auto"
+          : "animate-scale-in rounded-2xl"
           }`}
       >
         <div className="glass-card rounded-2xl border border-primary/20 shadow-2xl overflow-hidden">
@@ -122,7 +122,7 @@ const ContactModal = () => {
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Rohit Patil"
                   value={formData.name}
                   onChange={handleInputChange}
                   className="bg-muted/50 border-border focus:border-primary h-10"
@@ -138,7 +138,7 @@ const ContactModal = () => {
                   name="phone"
                   type="tel"
                   inputMode="numeric"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+91 1234567890"
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="bg-muted/50 border-border focus:border-primary h-10"
@@ -153,7 +153,7 @@ const ContactModal = () => {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="john@university.edu"
+                  placeholder="rohitpatil@gmail.com"
                   value={formData.email}
                   onChange={handleInputChange}
                   className="bg-muted/50 border-border focus:border-primary h-10"
