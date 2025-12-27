@@ -19,6 +19,13 @@ class Config:
     # Admin credentials
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
+    
+    # Email Configuration (Gmail SMTP)
+    SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
+    SMTP_EMAIL = os.environ.get('SMTP_EMAIL', '')  # Your Gmail address
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')  # Gmail App Password
+    NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL', '')  # Where to receive notifications
 
 
 class DevelopmentConfig(Config):

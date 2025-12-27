@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from supabase_client import get_supabase_client
+from email_utils import send_contact_notification_async
 import traceback
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -79,15 +80,20 @@ def submit_contact():
                 return jsonify({'success': False, 'error': f'{field} is required'}), 400
         
         supabase = get_supabase_client()
-        response = supabase.table('contact_submissions').insert({
+        contact_data = {
             'name': data['name'],
             'email': data['email'],
             'message': data['message'],
             'project_type': data.get('project_type', ''),
             'phone': data.get('phone', '')
-        }).execute()
+        }
+        response = supabase.table('contact_submissions').insert(contact_data).execute()
         
         print(f"Supabase response: {response}")
+        
+        # Send email notification in background (non-blocking)
+        send_contact_notification_async(contact_data)
+        
         return jsonify({'success': True, 'message': 'Contact form submitted successfully'}), 201
     except Exception as e:
         print(f"ERROR in /api/contact: {str(e)}")
