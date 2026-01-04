@@ -1,0 +1,50 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api/index.py"
+        },
+        {
+            "source": "/admin/(.*)",
+            "destination": "/api/index.py"
+        },
+        {
+            "source": "/health",
+            "destination": "/api/index.py"
+        }
+    ],
+    "builds": [
+        {
+            "src": "api/index.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "frontend/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/index.py"
+        },
+        {
+            "src": "/admin/(.*)",
+            "dest": "/api/index.py"
+        },
+        {
+            "src": "/health",
+            "dest": "/api/index.py"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/frontend/dist/index.html"
+        }
+    ]
+}
