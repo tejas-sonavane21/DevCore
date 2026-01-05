@@ -17,6 +17,10 @@
         {
             "source": "/health",
             "destination": "/api/index.py"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "builds": [
@@ -30,27 +34,6 @@
             "config": {
                 "distDir": "dist"
             }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/index.py"
-        },
-        {
-            "src": "/admin/(.*)",
-            "dest": "/api/index.py"
-        },
-        {
-            "src": "/health",
-            "dest": "/api/index.py"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/frontend/dist/index.html"
         }
     ]
 }
